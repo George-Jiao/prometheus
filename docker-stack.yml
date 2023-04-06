@@ -10,7 +10,7 @@ networks:
 services:
 
   prometheus:
-    image: prom/prometheus:v2.36.2
+    image: prom/prometheus:latest
     volumes:
       - ./prometheus/:/etc/prometheus/
       - prometheus_data:/prometheus
@@ -47,7 +47,7 @@ services:
       - --collector.filesystem.ignored-mount-points
       - "^/(sys|proc|dev|host|etc|rootfs/var/lib/docker/containers|rootfs/var/lib/docker/overlay2|rootfs/run/docker/netns|rootfs/var/lib/docker/aufs)($$|/)"
     ports:
-      - 9100:9100
+      - 9091:9100
     networks:
       - monitor-net
     deploy:
@@ -56,7 +56,7 @@ services:
           condition: on-failure
 
   alertmanager:
-    image: prom/alertmanager
+    image: prom/alertmanager:latest
     ports:
       - 9093:9093
     volumes:
@@ -71,7 +71,7 @@ services:
         constraints:
            - node.role==manager
       restart_policy:
-        condition: on-failure    
+        condition: on-failure
 
   cadvisor:
     image: gcr.io/cadvisor/cadvisor
@@ -81,7 +81,7 @@ services:
       - /sys:/sys:ro
       - /var/lib/docker/:/var/lib/docker:ro
     ports:
-      - 8080:8080
+      - 9092:8080
     networks:
       - monitor-net
     deploy:
@@ -90,11 +90,11 @@ services:
           condition: on-failure
 
   grafana:
-    image: grafana/grafana
+    image: grafana/grafana:latest
     depends_on:
       - prometheus
     ports:
-      - 3000:3000
+      - 9100:3000
     volumes:
       - grafana_data:/var/lib/grafana
       - ./grafana/provisioning/:/etc/grafana/provisioning/
@@ -110,6 +110,23 @@ services:
       restart_policy:
         condition: on-failure
 
+  nvidia_smi_exporter:
+    image: utkuozdemir/nvidia_gpu_exporter:1.2.0
+    ports:
+      - 9094:9835
+    volumes:
+      - /usr/lib/x86_64-linux-gnu/libnvidia-ml.so:/usr/lib/x86_64-linux-gnu/libnvidia-ml.so
+      - /usr/lib/x86_64-linux-gnu/libnvidia-ml.so.1:/usr/lib/x86_64-linux-gnu/libnvidia-ml.so.1
+      - /usr/bin/nvidia-smi:/usr/bin/nvidia-smi
+    devices:
+      - /dev/nvidiactl:/dev/nvidiactl
+      - /dev/nvidia0:/dev/nvidia0
+    networks:
+      - monitor-net
+    deploy:
+      mode: global
+      restart_policy:
+          condition: on-failure
 #  pushgateway:
 #    image: prom/pushgateway
 #    deploy:

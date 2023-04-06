@@ -42,7 +42,7 @@ scrape_configs:
     scrape_interval: 15s
 
     static_configs:
-      - targets: ['cadvisor:8080']
+      - targets: ['cadvisor:9092']
 
   - job_name: 'node-exporter'
 
@@ -50,4 +50,11 @@ scrape_configs:
     scrape_interval: 15s
   
     static_configs:
-      - targets: ['node-exporter:9100']
+      - targets: ['node-exporter:9091']
+
+  - job_name: 'nvidia_smi_exporter'
+
+    scrape_interval: 15s
+
+    static_configs:
+      - targets: ['nvidia_smi_exporter:9094']

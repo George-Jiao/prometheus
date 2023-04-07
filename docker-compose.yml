@@ -109,15 +109,25 @@ services:
   nvidia_smi_exporter:
     image: utkuozdemir/nvidia_gpu_exporter:1.2.0
     ports:
-      - 9094:9385
+      - 9094:9835
     volumes:
       - /usr/lib/x86_64-linux-gnu/libnvidia-ml.so:/usr/lib/x86_64-linux-gnu/libnvidia-ml.so
       - /usr/lib/x86_64-linux-gnu/libnvidia-ml.so.1:/usr/lib/x86_64-linux-gnu/libnvidia-ml.so.1
       - /usr/bin/nvidia-smi:/usr/bin/nvidia-smi
-    devices:
-      - /dev/nvidiactl:/dev/nvidiactl
-      - /dev/nvidia0:/dev/nvidia0
+    # devices:
+    #   - /dev/nvidiactl:/dev/nvidiactl
+    #   - /dev/nvidia0:/dev/nvidia0
     restart: always
+    networks:
+    - back-tier
+
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 0
+              capabilities: [gpu]
 
 #  pushgateway:
 #    image: prom/pushgateway

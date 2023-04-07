@@ -118,15 +118,18 @@ services:
       - /usr/lib/x86_64-linux-gnu/libnvidia-ml.so:/usr/lib/x86_64-linux-gnu/libnvidia-ml.so
       - /usr/lib/x86_64-linux-gnu/libnvidia-ml.so.1:/usr/lib/x86_64-linux-gnu/libnvidia-ml.so.1
       - /usr/bin/nvidia-smi:/usr/bin/nvidia-smi
-    devices:
-      - /dev/nvidiactl:/dev/nvidiactl
-      - /dev/nvidia0:/dev/nvidia0
     networks:
       - monitor-net
     deploy:
       mode: global
       restart_policy:
           condition: on-failure
+      # resources:
+      #   reservations:
+      #     devices:
+      #       - driver: nvidia
+      #         device_ids: ['0']
+      #         capabilities: [gpu]
 #  pushgateway:
 #    image: prom/pushgateway
 #    deploy:
